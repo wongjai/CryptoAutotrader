@@ -2,7 +2,7 @@
 Prediction module
 
 @Developer: Stan
-@ModuleVersion: 2.1.0
+@ModuleVersion: 2.1.1
 @PythonVersion: 3.13
 
 """
@@ -12,7 +12,7 @@ from typing import Any, Self, Callable, Literal
 
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from groq import Groq
 from groq.types.chat import ChatCompletion
 from groq.types.chat.chat_completion import Choice
@@ -28,13 +28,18 @@ class PredictionApp:
 
     """
 
-    def __init__(self: Self, env_file_path: str) -> None:
+    def __init__(self: Self, env_file_path: str = None) -> None:
         """
         Initialize prediction app class instance
         :param env_file_path:
         """
 
-        load_dotenv(dotenv_path=env_file_path)
+        # If .env filepath is supplied, use it. Or else '.env' is used.
+        if env_file_path:
+            load_dotenv(dotenv_path=env_file_path)
+        else:
+            load_dotenv(find_dotenv())
+
         self.prediction_api: str = getenv("DEFAULT_PREDICTION_API")
         print(f"\t[INFO]\tAI backend: `{self.prediction_api}`.")
 

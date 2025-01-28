@@ -2,8 +2,8 @@
 Main bot module
 
 @Developer: Stan
-@AppVersion: 3.1.1
-@ModuleVersion: 3.1.1
+@AppVersion: 3.1.2
+@ModuleVersion: 3.1.2
 @PythonVersion: 3.13
 
 """
@@ -18,7 +18,7 @@ from typing import Any, Callable, Literal, Mapping, Self, Collection
 import ccxt
 from ccxt.base.errors import InvalidOrder
 from ccxt import Exchange
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 from config import Color
 from predict import PredictionApp
@@ -33,8 +33,8 @@ class App:
 
     def __init__(
             self: Self,
-            env_file_path: str,
-            prediction_api: Callable[[Any], str]
+            prediction_api: Callable[[Any], str],
+            env_file_path: str = None
     ) -> None:
         """
 
@@ -42,8 +42,11 @@ class App:
         :param prediction_api: function
         """
 
-        # Check for '<something>.env' file
-        load_dotenv(dotenv_path=env_file_path)
+        # If .env filepath is supplied, use it. Or else '.env' is used.
+        if env_file_path:
+            load_dotenv(dotenv_path=env_file_path)
+        else:
+            load_dotenv(find_dotenv())
 
         self.exchange_name: str = getenv("DEFAULT_EXCHANGE_NAME")
 
@@ -370,7 +373,7 @@ if __name__ == "__main__":
 
     # Main logic
     kucoin_trading_bot: App = App(
-        env_file_path=main_trading_env_path,
-        prediction_api=prediction_function
+        prediction_api=prediction_function,
+        env_file_path=main_trading_env_path
     )
     sys.exit(kucoin_trading_bot.main(infinite_loop_condition=True))
