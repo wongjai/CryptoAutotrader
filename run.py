@@ -369,5 +369,8 @@ if __name__ == "__main__":
     prediction_function: Callable[[Any], str] = prediction_app.predict_up_or_down
 
     # Main logic
-    kucoin_trading_bot: App = App(env_file_path=main_trading_env_path, prediction_api=prediction_function)
+    kucoin_trading_bot: App = App(
+        env_file_path=main_trading_env_path,
+        prediction_api=prediction_function
+    )
     sys.exit(kucoin_trading_bot.main(infinite_loop_condition=True))
