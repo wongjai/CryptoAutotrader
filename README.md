@@ -142,18 +142,18 @@ Link these `.env` files in [Python module run.py](run.py) in the `if __name__ ==
 
 The required packages are installed with:
 
-    ```pip install --root-user-action=ignore --upgrade pip && pip install --root-user-action=ignore -r requirements.txt```
+    pip install --root-user-action=ignore --upgrade pip && pip install --root-user-action=ignore -r requirements.txt
 
 
 #### 4
 
 Run from inside project directory:
 
-    ```python3 run.py```
+    python3 run.py
 
-Alternatively run from outside project directory (change `path_to_'run.py'` to actual path):
+Alternatively run from outside project directory (change `<path_to_`run.py`>` to actual path):
 
-    ```sudo python3 <path_to_`run.py`>```
+    sudo python3 <path_to_`run.py`>
 
 *Administrator password might be prompted to enter*
 
