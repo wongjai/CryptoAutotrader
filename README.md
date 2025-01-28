@@ -223,7 +223,7 @@ However, other reasons can be considered; thus making the liquidity-related sugg
 [This absolute unit of a Jupyter Notebook](test_xmrusdt.ipynb) is my gift to the noob Technical analysis enthusiasts.
 It can help them backtest their crossover strategies AND the code happens to be very compatible with this **Crypto Autotrader**.
 
-See my affiliate links:
+See my relevant affiliate links:
  * [Rent a VPS/VDS worldwide, pay in crypto!](https://my.bluevps.com/aff.php?aff=684)
  * [Crypto processing services for persons and businesses](https://account.nowpayments.io/create-account?link_id=3477503345)
 
