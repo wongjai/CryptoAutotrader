@@ -135,6 +135,7 @@ Parametrization of this software is achieved via the means of environment variab
 #### 2
 
 Link these `.env` files in [Python module run.py](run.py) in the `if __name__ == "__main__":` section as  `PREDICTION_ENVIRONMENT_FILENAME` and `MAIN_ENVIRONMENT_FILENAME` constants. They don't *have* to be separate files, but at least **a** filename must be supplied of a file containing the required Environment variables.
+Not specifying a `<something>.env` file would result in scanning the literal file with the path '.env' in the same directory as the script.
 
 ### Unix operating systems (GNU/Linux, macOS, ...)
 
