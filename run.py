@@ -225,7 +225,7 @@ class App:
                       f" {current_time.strftime('%B %d, %Y %I:%M:%S %p')}{Color.END}")
 
                 # Check if there are any open orders
-                print("\t[INFO]\t👀 Checking for open orders")
+                print("\t[INFO]\t👀 Checking for open orders for trading pair")
                 open_orders = self.exchange.fetch_open_orders(self.SYMBOL)
                 if not open_orders:
                     print("\t[INFO]\t🟢 No open orders.")
