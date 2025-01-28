@@ -1,0 +1,6 @@
+ccxt~=4.4.34
+groq~=0.13.0
+pandas~=2.2.3
+python-dotenv~=1.0.1
+stockstats~=0.6.3
+numpy~=2.2.1
