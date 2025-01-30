@@ -18,7 +18,7 @@ from groq.types.chat import ChatCompletion
 from groq.types.chat.chat_completion import Choice
 from stockstats import StockDataFrame
 
-
+# Future ideas
 # from strategies import Strategy
 
 

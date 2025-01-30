@@ -97,8 +97,8 @@ class App:
         # Set the symbol you want to trade on KuCoin
         self.symbol: str = getenv("TRADING_PAIR")
         pair_lst: list = self.symbol.split("/")
-        self.pair_item1: str = pair_lst[0]
-        self.pair_item2: str = pair_lst[1]
+        self.base_asset: str = pair_lst[0]
+        self.quote_asset: str = pair_lst[1]
 
         self.predict_up_or_down: Callable[[Any], str] = prediction_api
 
@@ -118,8 +118,8 @@ class App:
         """
         try:
             transaction_cost: float = round(amount * float(price), 2)
-            print(f"\t[INFO]\t⭐️ {Color.ITALIC}Trying to {buy_or_sell} {self.pair_item1} with "
-                  f"total transaction value ≈ {transaction_cost} {self.pair_item2}.{Color.END}")
+            print(f"\t[INFO]\t⭐️ {Color.ITALIC}Trying to {buy_or_sell} {self.base_asset} with "
+                  f"total transaction value ≈ {transaction_cost} {self.quote_asset}.{Color.END}")
             if amount > self.min_transaction_value_in_base:
                 order_id: Mapping[str, Any] = self.exchange.create_order(
                     symbol=self.symbol,
@@ -142,8 +142,8 @@ class App:
         else:
 
             print(f"[ACTION DONE]\t🤝 Place a limit {Color.BOLD}{buy_or_sell} order{Color.END}"
-                  f" of {Color.BOLD}{self.pair_item1.lower()}{amount}{Color.END} x"
-                  f" {self.pair_item2.lower()}{price} ≈ {self.pair_item2.lower()}{transaction_cost}")
+                  f" of {Color.BOLD}{self.base_asset.lower()}{amount}{Color.END} x"
+                  f" {self.quote_asset.lower()}{price} ≈ {self.quote_asset.lower()}{transaction_cost}")
             return order_id
 
     def prepare_order(self: Self) -> tuple[float | None, float | None, float | None, float | None]:
@@ -157,10 +157,10 @@ class App:
 
         # Get current balance
         balance = self.exchange.fetch_balance()
-        base_asset_balance = balance[self.pair_item1]["free"]
-        quote_asset_balance = balance[self.pair_item2]["free"]
-        print(f"\t[INFO]\t💰 {self.pair_item1} balance: {base_asset_balance}")
-        print(f"\t[INFO]\t💵 {self.pair_item2} balance: {quote_asset_balance}")
+        base_asset_balance = balance[self.base_asset]["free"]
+        quote_asset_balance = balance[self.quote_asset]["free"]
+        print(f"\t[INFO]\t💰 {self.base_asset} balance: {base_asset_balance}")
+        print(f"\t[INFO]\t💵 {self.quote_asset} balance: {quote_asset_balance}")
 
         try:
             orderbook: Mapping[str, Any] = self.exchange.fetch_order_book(symbol=self.symbol)
@@ -182,8 +182,8 @@ class App:
         # Check the current bid and ask prices
         bid: float = float(bid)
         ask: float = float(ask)
-        print(f"\t[INFO]\tBid {Color.ITALIC}≈ {round(bid, 4)} {self.pair_item2}{Color.END}"
-              f", Ask {Color.ITALIC}≈ {round(ask, 4)} {self.pair_item2}{Color.END}\n")
+        print(f"\t[INFO]\tBid {Color.ITALIC}≈ {round(bid, 4)} {self.quote_asset}{Color.END}"
+              f", Ask {Color.ITALIC}≈ {round(ask, 4)} {self.quote_asset}{Color.END}\n")
 
         # Price is ALWAYS in quote asset (2nd item in trading pair `1st/2nd`)
         mean_price: float = (ask + bid) / 2
@@ -203,6 +203,109 @@ class App:
 
         return price_buy, price_sell, amount_buy, amount_sell
 
+    def run_if_open_orders(self: Self, open_orders: Collection[Any]) -> bool:
+        """
+        Cancel all open orders on achieving Limit value.
+
+        :param open_orders:
+        :return: bool, if the while cycle of orders should be skipped to the next iteration
+        """
+        print("\t[INFO]\t🛑 There are open orders.")
+
+        self.cancel_order_counter += 1
+        print(f"\t[INFO]\t💪🏻 {Color.ITALIC}Current open orders counter:{Color.END}"
+              f" {Color.BOLD}{Color.DARKCYAN}{self.cancel_order_counter}{Color.END}.")
+
+        if self.cancel_order_counter == self.cancel_order_limit:
+            self.cancel_order_counter = 0
+            for order in open_orders:
+                order_id_to_cancel: str = order.get("id")
+                self.exchange.cancel_order(order_id_to_cancel)
+                print(f"[ACTION DONE]\t☑️ {Color.BOLD}Order"
+                      f" cancelled{Color.END} with id: {order_id_to_cancel}")
+            return True
+
+        return False
+
+    def run_if_not_open_orders(self: Self) -> bool:
+        """
+        Try to make new orders, if there aren't any.
+
+        :return: if the while cycle of orders should be skipped to the next iteration
+        """
+        print("\t[INFO]\t🟢 No open orders.")
+
+        data: Any = self.exchange.fetch_ohlcv(
+            self.symbol, self.timeframe, limit=self.data_vector_length)
+        print("\t[INFO]\t📊 Got data: "
+              f"({self.data_vector_length} x {self.timeframe}).")
+
+        try:
+            # Check if it is bullish up or bearish down before buying
+            prediction_main: Any = self.predict_up_or_down(data)
+            # prediction_support: Any = self.predict_up_or_down(data)
+            if prediction_main:
+                print("\t[AI]\t🤖 Got prediction.")
+
+            else:
+                print("\t[AI]\t🤖 Could not get prediction.")
+                self.retries_before_sleep_counter += 1
+                if self.retries_before_sleep_counter == self.retries_before_sleep_limit:
+                    self.retries_before_sleep_counter = 0
+                    self.global_sleep()
+                return True
+
+            # If bullish
+            if prediction_main == "up":
+                print(f"\t[AI]\t🤖 Is {Color.GREEN}bullish{Color.END} on {self.base_asset}.")
+
+                price_buy, _, amount_buy, _ = self.prepare_order()
+                if amount_buy is None:
+                    return True
+
+                # Place a limit buy order
+                self.order(
+                    order_type="limit",
+                    buy_or_sell="buy",
+                    amount=amount_buy,
+                    price=price_buy
+                )
+
+            # If bearish
+            elif prediction_main == "down":
+                print(f"\t[AI]\t🤖 Is {Color.RED}bearish{Color.END} on {self.base_asset}.")
+
+                _, price_sell, _, amount_sell = self.prepare_order()
+                if amount_sell is None:
+                    return True
+
+                # Place a limit sell order
+                self.order(
+                    order_type="limit",
+                    buy_or_sell="sell",
+                    amount=amount_sell,
+                    price=price_sell
+                )
+
+            # If indecisive
+            elif prediction_main == "hold":
+                print(f"\t[AI]\t🤖 Is {Color.PURPLE}hold{Color.END} on {self.base_asset}.")
+                print("\t[INFO]\t😎 Doing nothing.")
+
+            else:
+                self.global_sleep()
+                return True
+
+        except BaseException as error:
+            self.retries_before_sleep_counter += 1
+            if self.retries_before_sleep_counter == self.retries_before_sleep_limit:
+                self.retries_before_sleep_counter = 0
+                self.default_sleep_message(error, "ProbablyAIButCouldBeAnything")
+                self.global_sleep()
+            return True
+
+        return False
+
     def main(self: Self, infinite_loop_condition: bool) -> None:
         """
         Main bot cycle logic.
@@ -217,7 +320,8 @@ class App:
               "\t[INFO]\t📈 Algorithm premium: "
               f"{Color.DARKCYAN}{round(self.premium * 100, 4)}%{Color.END}.\n"
               "\t[INFO]\t📉 Lower limit: "
-              f"{Color.DARKCYAN}{self.min_transaction_value_in_base} {self.pair_item1}{Color.END}.\n\n"
+              f"{Color.DARKCYAN}{self.min_transaction_value_in_base} "
+              f"{self.base_asset}{Color.END}.\n\n"
               f"\t[INFO]\t🚀 Started algorithm with pair `{self.symbol}`.")
 
         while infinite_loop_condition:
@@ -229,98 +333,16 @@ class App:
 
                 # Check if there are any open orders
                 print("\t[INFO]\t👀 Checking for open orders for trading pair")
-                open_orders = self.exchange.fetch_open_orders(self.symbol)
+                open_orders: Collection[Any] = self.exchange.fetch_open_orders(self.symbol)
                 if not open_orders:
-                    print("\t[INFO]\t🟢 No open orders.")
-
-                    data: Any = self.exchange.fetch_ohlcv(
-                        self.symbol, self.timeframe, limit=self.data_vector_length)
-                    print("\t[INFO]\t📊 Got data: "
-                          f"({self.data_vector_length} x {self.timeframe}).")
-
-                    try:
-                        # Check if it is bullish up or bearish down before buying
-                        prediction_main: Any = self.predict_up_or_down(data)
-                        # prediction_support: Any = self.predict_up_or_down(data)
-                        if prediction_main:
-                            print("\t[AI]\t🤖 Got prediction.")
-
-                        else:
-                            print("\t[AI]\t🤖 Could not get prediction.")
-                            self.retries_before_sleep_counter += 1
-                            if self.retries_before_sleep_counter == self.retries_before_sleep_limit:
-                                self.retries_before_sleep_counter = 0
-                                self.global_sleep()
-                            continue
-
-                        # If bullish
-                        if prediction_main == "up":
-                            print(f"\t[AI]\t🤖 Is {Color.GREEN}bullish{Color.END} on {self.pair_item1}.")
-
-                            price_buy, _, amount_buy, _ = self.prepare_order()
-                            if amount_buy is None:
-                                continue
-
-                            # Place a limit buy order
-                            order_id: Mapping[str, Any] = self.order(
-                                order_type="limit",
-                                buy_or_sell="buy",
-                                amount=amount_buy,
-                                price=price_buy
-                            )
-
-                        # If bearish
-                        elif prediction_main == "down":
-                            print(f"\t[AI]\t🤖 Is {Color.RED}bearish{Color.END} on {self.pair_item1}.")
-
-                            _, price_sell, _, amount_sell = self.prepare_order()
-                            if amount_sell is None:
-                                continue
-
-                            # Place a limit sell order
-                            order_id: Mapping[str, Any] = self.order(
-                                order_type="limit",
-                                buy_or_sell="sell",
-                                amount=amount_sell,
-                                price=price_sell
-                            )
-
-                        # If indecisive
-                        elif prediction_main == "hold":
-                            print(f"\t[AI]\t🤖 Is {Color.PURPLE}hold{Color.END} on {self.pair_item1}.")
-                            print("\t[INFO]\t😎 Doing nothing.")
-
-                        else:
-                            self.global_sleep()
-                            continue
-
-                        if "order_id" in locals():
-                            if bool(order_id):
-                                print(f"[ORDER]:\t{order_id}.\n")
-                            del order_id
-
-                    except BaseException as error:
-                        self.retries_before_sleep_counter += 1
-                        if self.retries_before_sleep_counter == self.retries_before_sleep_limit:
-                            self.retries_before_sleep_counter = 0
-                            self.default_sleep_message(error, "ProbablyAIButCouldBeAnything")
-                            self.global_sleep()
+                    do_cycle_continue: bool = self.run_if_not_open_orders()
+                    if do_cycle_continue:
                         continue
 
                 else:
-                    print("\t[INFO]\t🛑 There are open orders.")
+                    do_cycle_continue: bool = self.run_if_open_orders(open_orders=open_orders)
 
-                    self.cancel_order_counter += 1
-                    print(f"\t[INFO]\t💪🏻 {Color.ITALIC}Current open orders counter:{Color.END}"
-                          f" {Color.BOLD}{Color.DARKCYAN}{self.cancel_order_counter}{Color.END}.")
-
-                    if self.cancel_order_counter == self.cancel_order_limit:
-                        self.cancel_order_counter = 0
-                        for order in open_orders:
-                            order_id_to_cancel: str = order.get("id")
-                            self.exchange.cancel_order(order_id_to_cancel)
-                            print(f"[ACTION DONE]\t☑️ {Color.BOLD}Order"
-                                  f" cancelled{Color.END} with id: {order_id_to_cancel}")
+                    if do_cycle_continue:
                         continue
 
                 self.global_sleep()
@@ -347,10 +369,22 @@ class App:
         print("[END]\t👋🏻 END `main` module.")
 
     def global_sleep(self: Self) -> None:
+        """
+        Invoke time.sleep with needed extra logic.
+
+        :return: None
+        """
         print(f"\t[INFO]\t🙈 Pause for {self.base_sleep_time} seconds.")
         sleep(self.base_sleep_time)
 
     def default_sleep_message(self: Self, error: Any, tag: str) -> None:
+        """
+        Print sleep message with error mention. Tag is the error name.
+
+        :param error: Exception
+        :param tag: str
+        :return: None
+        """
         print(f"\t[ERROR]\t🙈 Retrying after sleep ({self.base_sleep_time} seconds). "
               f"{tag} exception:\n\t\t{error}.\n")
 
