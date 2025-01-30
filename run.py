@@ -18,7 +18,7 @@ from typing import Any, Callable, Literal, Mapping, Self, Collection
 import ccxt
 from ccxt.base.errors import InvalidOrder
 from ccxt import Exchange
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 
 from config import Color
 from predict import PredictionApp
@@ -43,10 +43,8 @@ class App:
         """
 
         # If .env filepath is supplied, use it. Or else '.env' is used.
-        if env_file_path:
-            load_dotenv(dotenv_path=env_file_path)
-        else:
-            load_dotenv(find_dotenv())
+        env_file_path = env_file_path or ".env"
+        load_dotenv(dotenv_path=env_file_path)
 
         self.exchange_name: str = getenv("DEFAULT_EXCHANGE_NAME")
 
