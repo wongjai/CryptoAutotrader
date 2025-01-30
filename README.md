@@ -113,7 +113,7 @@ If `DEFAULT_PREDICTION_API=PANDAS`, then:
 
 `PREDICTION_INDICATORS_JSON` – valid json array of stockstats.StockDataFrame supported indicators (e.g., `["close_5,15_kama","middle_15_ema"]`). Numbers cannot exceed `DATA_VECTOR_LENGTH`.
 
-`PREDICTION_GLOBAL_SIGNAL_LAG` – integer value of 1 or greater (cannot exceed `DATA_VECTOR_LENGTH`). Currently, the usage of a lagged crossover is hardcoded as per the vision of the developer; however, altering that is very achievable: updated can be the `predict_pandas` function in module `predict.py` – specifically, the way that lists `signals` and `anti_signals` are filled. The part `{"_delta" * self.wait_for_n_signal_lags}` just needs to be eliminated, as does any subsequent mentions of `self.wait_for_n_signal_lags`.
+`PREDICTION_GLOBAL_SIGNAL_LAG` – integer value of 1 or greater (cannot exceed `DATA_VECTOR_LENGTH`). Currently, the usage of a lagged crossover is hardcoded as per the vision of the developer; however, altering that is very achievable: updated can be the `predict_pandas` function in module `predict.py` – specifically, the way that lists `signals` and `anti_signals` are filled. The part `{"_delta" * self.wait_for_n_signal_lags}` just needs to be eliminated, as do any subsequent mentions of `self.wait_for_n_signal_lags`.
 
 #### Case 2
 If `DEFAULT_PREDICTION_API=GROQ`, then:
@@ -177,17 +177,13 @@ Untested, but flawless deployment is probable. The [.Dockerfile](.Dockerfile) is
 
 ## 🚀 About Me
 
-I'm a Full Stack SDE, specializing in all things Python. I code a lot, I don't publish my code a lot. I also happen to be a domain expert in Business, Economics & Finance, holding both M.Sc. & B.Sc. degrees in relevant fields of study.
+I'm a Full Stack Software Engineer, specializing in all things Python. I code a lot, I don't publish my code a lot. I also happen to be a domain expert in Business, Economics & Finance, holding both M.Sc. & B.Sc. degrees in relevant fields of study.
 
 I might be available for hire at a random time. Reach out with offers via email stevietfg+joboffer@gmail.com.
 
 If you'd like to support my endeavors (or my lifestyle, in general), in accordance with the nature and character of this software, I accept donations in one truly CRYPTO currency – [Monero (XMR)](https://www.getmonero.org) at addresses: 
 
- * Exchange style address: `87RKqTk7CrUUfVQRABcfhA2369T6vRK2A2XNFPayGcVTFc1QpW4AuSy6cjc4GpzGbmS6W6m49AuKRPxzMgo12j2W6jG8ySx`
-
-
- * Regular format address: `4BDMZQaXRYMUE8PBBddmPRTEV4TSQ4ecpY8u7ZKCRFT6DTKCjJsqCzi7st5XWa47CTAad5mXemkFoJnjW16of7GwPpgtsnB`
-
+ * `4BDMZQaXRYMUE8PBBddmPRTEV4TSQ4ecpY8u7ZKCRFT6DTKCjJsqCzi7st5XWa47CTAad5mXemkFoJnjW16of7GwPpgtsnB`
 
 Monero is also the default crypto for this **Crypto Autotrader** to spot-trade.
 
