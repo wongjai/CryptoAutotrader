@@ -191,11 +191,11 @@ For support & troubleshooting, email crypto.autotrader@outlook.com (with Subject
 
 *Any attention that I offer to the sender, I do at my own discretion; any sender would be respectful of my time.*
 
-This repository can be forked and made the needed changes with, in such case that I don't respond.
+This repository can be forked and made the needed changes with, in such cases that I don't respond.
 
 ## Feedback & Ideas
 
-For new ideas, issues can be opened, but appreciated are emails at stevietfg+tradingbotideas@gmail.com (with Subject: `[AUTOTRADER IDEAS]`)
+For new ideas, issues can be opened, but appreciated are emails at crypto.autotrader@outlook.com (with Subject: `[AUTOTRADER IDEAS]`)
 
 
 ## Acknowledgements
