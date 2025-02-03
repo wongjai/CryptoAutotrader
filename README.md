@@ -10,9 +10,17 @@
 # Crypto Autotrader
 <img src="images/logo-modified.png" width=100 /> © Stan
 
+![GitHub Repo stars](https://img.shields.io/github/stars/FunnyRabbitIsAHabbit/CryptoAutotrader)
+
+
 ![MIT License](https://img.shields.io/badge/License-MIT-green.svg)
 
 ![Static Badge](https://img.shields.io/badge/Python-3.13-brightgreen?logo=python)
+
+![GitHub repo size](https://img.shields.io/github/repo-size/FunnyRabbitIsAHabbit/CryptoAutotrader)
+
+
+![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/CAutotrader)
 
 This software is capable of fully autonomous trading on popular cryptocurrency exchanges, once set up correctly.
 
