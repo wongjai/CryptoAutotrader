@@ -187,7 +187,7 @@ Monero is also the default crypto for this **Crypto Autotrader** to spot-trade.
 
 ## Support
 
-For support & troubleshooting, email stevietfg+tradingbotsupport@gmail.com (with Subject: `[AUTOTRADER SUPPORT]`).
+For support & troubleshooting, email crypto.autotrader@outlook.com (with Subject: `[AUTOTRADER SUPPORT]`).
 
 *Any attention that I offer to the sender, I do at my own discretion; any sender would be respectful of my time.*
 
