@@ -18,6 +18,7 @@ from groq.types.chat import ChatCompletion
 from groq.types.chat.chat_completion import Choice
 from stockstats import StockDataFrame
 
+
 # Future ideas
 # from strategies import Strategy
 
@@ -44,7 +45,18 @@ class PredictionApp:
         if self.prediction_api == "GROQ":
             self.groq_api_key: str = getenv("GROQ_API_KEY")
             self.groq_model: str = getenv("GROQ_MODEL")
-            self.pre_prompt = "Predict UP or DOWN, or HOLD (no other information)"
+            self.pre_prompt: str = "Predict UP or DOWN, or HOLD (no other information)"
+
+        elif self.prediction_api == "PROBABILITY_GROQ":
+            self.groq_api_key: str = getenv("GROQ_API_KEY")
+            self.groq_model: str = getenv("GROQ_MODEL")
+            self.pre_prompt: str = ("Predict probability of price going up (answer in "
+                               "range [0-100], no other information)")
+            self.lower_prob: float = float(getenv("LOWER_PROB"))
+            self.upper_prob: float = float(getenv("UPPER_PROB"))
+            if not (0.0 <= self.lower_prob <= self.upper_prob <= 100.0):
+                self.lower_prob = 20.0
+                self.upper_prob = 80.0
 
         elif self.prediction_api == "PANDAS":
             self.indicators: set[str] = set(json.loads(
@@ -75,8 +87,14 @@ class PredictionApp:
             print(f"\t[AI]\tUsing GROQ ({self.groq_model})")
             return self.predict_up_or_down_with_groq
 
+        if self.prediction_api == "PROBABILITY_GROQ":
+            print(f"\t[AI]\tUsing GROQ PROBABILITY ({self.groq_model}) "
+                  f"with <{self.lower_prob}% and >{self.upper_prob}%")
+            return self.predict_probability_with_groq
+
         if self.prediction_api is None or self.prediction_api == "PANDAS":
-            print(f"\t[AI]\tUsing Pandas: price/short-trend `{self.price_type_column_name}` OVER {self.indicators}.")
+            print(f"\t[AI]\tUsing Pandas: price/short-trend "
+                  f"`{self.price_type_column_name}` OVER {self.indicators}.")
             pd.options.mode.copy_on_write = True
             return self.predict_pandas
 
@@ -173,6 +191,26 @@ class PredictionApp:
 
         if signal_sell:
             return "down"
+
+        return "hold"
+
+    def predict_probability_with_groq(self: Self,
+                                      data: Any) -> Literal["up", "down", "hold"]:
+        """
+
+        :param data:
+        :return:
+        """
+
+        res: str | None = self.predict_up_or_down_with_groq(data=data)
+        if res:
+            f = float(res)
+            print(f"\t[AI]\tProbability of uptrend: {f}%")
+            if 0.0 <= f <= self.lower_prob:
+                return "down"
+
+            if self.upper_prob <= f <= 100.0:
+                return "up"
 
         return "hold"
 

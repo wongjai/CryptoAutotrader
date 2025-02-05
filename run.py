@@ -390,7 +390,7 @@ class App:
 
 
 if __name__ == "__main__":
-    PREDICTION_ENVIRONMENT_FILENAME: str = "pandas.env"
+    PREDICTION_ENVIRONMENT_FILENAME: str = "probability.env"
     MAIN_ENVIRONMENT_FILENAME: str = "main.env"
     print("[START]\tSTARTED `main` module.")
 
