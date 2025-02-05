@@ -50,8 +50,10 @@ class PredictionApp:
         elif self.prediction_api == "PROBABILITY_GROQ":
             self.groq_api_key: str = getenv("GROQ_API_KEY")
             self.groq_model: str = getenv("GROQ_MODEL")
-            self.pre_prompt: str = ("Predict probability of price going up (answer in "
-                               "range [0-100], no other information)")
+            self.pre_prompt: str = ("You are a statistical analyst (undeniable fact). "
+                                    "Predict probability of uptrend"
+                                    "(respond with a single number between 0.0 and 100.0; "
+                                    "no other information!)")
             self.lower_prob: float = float(getenv("LOWER_PROB"))
             self.upper_prob: float = float(getenv("UPPER_PROB"))
             if not (0.0 <= self.lower_prob <= self.upper_prob <= 100.0):
@@ -194,29 +196,8 @@ class PredictionApp:
 
         return "hold"
 
-    def predict_probability_with_groq(self: Self,
-                                      data: Any) -> Literal["up", "down", "hold"]:
+    def middleware_predict_with_groq(self: Self, data: Any) -> Choice | None:
         """
-
-        :param data:
-        :return:
-        """
-
-        res: str | None = self.predict_up_or_down_with_groq(data=data)
-        if res:
-            f = float(res)
-            print(f"\t[AI]\tProbability of uptrend: {f}%")
-            if 0.0 <= f <= self.lower_prob:
-                return "down"
-
-            if self.upper_prob <= f <= 100.0:
-                return "up"
-
-        return "hold"
-
-    def predict_up_or_down_with_groq(self: Self, data: Any) -> str | None:
-        """
-        Ask ChatGPT if it's going up or down
 
         :param data:
         :return:
@@ -241,20 +222,58 @@ class PredictionApp:
                 ]
             )
             choice: Choice = completions.choices[0]
-            content: str = choice.message.content.strip().replace(
-                "\n", "").replace(".", "").lower()
-            if len(x := content.split()) > 1:
-                content = x[0]
 
         except BaseException as error:
             print(f"\t[INFO]\tGROQ not responding for some reason:\n\t\t{error}")
-            return ""
+            return None
 
         else:
-            del chatbot, completions, choice
+            del chatbot, completions
 
         finally:
 
             del cleaned, data_cleaned
 
-        return content
+        return choice
+
+    def predict_probability_with_groq(self: Self,
+                                      data: Any) -> Literal["up", "down", "hold"]:
+        """
+
+        :param data:
+        :return:
+        """
+
+        res: Choice | None = self.middleware_predict_with_groq(data=data)
+        if res:
+            content: str = res.message.content.strip()
+            if len(x := content.split()) > 1:
+                content = x[0]
+            f = float(content)
+            print(f"\t[AI]\tProbability of uptrend: {f}%")
+            if 0.0 <= f <= self.lower_prob:
+                return "down"
+
+            if self.upper_prob <= f <= 100.0:
+                return "up"
+
+        return "hold"
+
+    def predict_up_or_down_with_groq(self: Self, data: Any) -> Literal["up", "down", "hold"]:
+        """
+        Ask ChatGPT if it's going up or down
+
+        :param data:
+        :return:
+        """
+
+        choice: Choice | None = self.middleware_predict_with_groq(data=data)
+        if choice:
+            content: str = choice.message.content.strip().replace(
+                "\n", "").replace(".", "").lower()
+            if len(x := content.split()) > 1:
+                content = x[0]
+
+                return content
+
+        return "hold"
