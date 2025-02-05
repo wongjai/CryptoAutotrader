@@ -138,7 +138,7 @@ If `DEFAULT_PREDICTION_API=GROQ`, then:
 
 `GROQ_API_KEY` – api key to access GROQ
 
-`GROQ_MODEL` – GROQ API supported model name (e.g., `llama-3.1-8b-instant`)
+`GROQ_MODEL` – GROQ API supported model name (e.g., `gemma2-9b-it`)
 
 #### Case 3
 
@@ -146,7 +146,7 @@ If `DEFAULT_PREDICTION_API=PROBABILITY_GROQ`, then:
 
 `GROQ_API_KEY` – api key to access GROQ
 
-`GROQ_MODEL` – GROQ API supported model name (e.g., `llama-3.1-8b-instant`)
+`GROQ_MODEL` – GROQ API supported model name (e.g., `gemma2-9b-it`)
 
 `LOWER_PROB` – Sell on lower than 
 
