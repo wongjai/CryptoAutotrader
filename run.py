@@ -141,7 +141,7 @@ class App:
 
         else:
 
-            print(f"[ACTION DONE]\t🤝 Place a limit {Color.BOLD}{buy_or_sell} order{Color.END}"
+            print(f"\t[ACTION DONE]\t🤝 Place a limit {Color.BOLD}{buy_or_sell} order{Color.END}"
                   f" of {Color.BOLD}{self.base_asset.lower()}{amount}{Color.END} x"
                   f" {self.quote_asset.lower()}{price} ≈ {self.quote_asset.lower()}{transaction_cost}")
             return order_id
@@ -234,6 +234,7 @@ class App:
         :return: if the while cycle of orders should be skipped to the next iteration
         """
         print("\t[INFO]\t🟢 No open orders.")
+        self.cancel_order_counter = 0
 
         data: Any = self.exchange.fetch_ohlcv(
             self.symbol, self.timeframe, limit=self.data_vector_length)
@@ -264,12 +265,13 @@ class App:
                     return True
 
                 # Place a limit buy order
-                self.order(
+                new_order: Mapping[str, Any] = self.order(
                     order_type="limit",
                     buy_or_sell="buy",
                     amount=amount_buy,
                     price=price_buy
                 )
+                print(f"\t[ORDER]\tNew buy order placed with id: {new_order.get("id")}")
 
             # If bearish
             elif prediction_main == "down":
@@ -280,12 +282,14 @@ class App:
                     return True
 
                 # Place a limit sell order
-                self.order(
+                new_order: Mapping[str, Any] = self.order(
                     order_type="limit",
                     buy_or_sell="sell",
                     amount=amount_sell,
                     price=price_sell
                 )
+
+                print(f"\t[ORDER]\tNew sell order placed: {new_order.get("id")}")
 
             # If indecisive
             elif prediction_main == "hold":
