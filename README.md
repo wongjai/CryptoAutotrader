@@ -111,10 +111,10 @@ their portfolio, before an order can be placed (If that isn't the case, the scri
 
 ### Predictive module variables
 
-*(easier to create a new `predictions.env` or `pandas.env` as per [example 1](predictions.env.example)
-or [example 2](pandas.env.example), that have included explanations for each variable, as well)*
+*(easier to create a new `llm.env` or `probability.env`, or `pandas.env` as per [example 1](llm.env.example)
+[example 2](probability_llm.env.example), or [example 3](pandas.env.example), that have included explanations for each variable, as well)*
 
-`DEFAULT_PREDICTION_API` – either `GROQ` or `PANDAS`, or `PROBABILITY_GROQ` is supported
+`DEFAULT_PREDICTION_API` – either `LLM` or `PROBABILITY_LLM`, or `PANDAS` is supported
 
 #### Case 1
 
@@ -134,23 +134,19 @@ subsequent mentions of `self.wait_for_n_signal_lags`.
 
 #### Case 2
 
-If `DEFAULT_PREDICTION_API=GROQ`, then:
+If `DEFAULT_PREDICTION_API=LLM`, then:
 
-`GROQ_API_KEY` – api key to access GROQ
+`LLM_BASE_URL` – base URL for API of your chosen LLM,
 
-`GROQ_MODEL` – GROQ API supported model name (e.g., `gemma2-9b-it`)
+`LLM_API_KEY` – your LLM api key,
 
-#### Case 3
+`LLM_MODEL` – model to use,
 
-If `DEFAULT_PREDICTION_API=PROBABILITY_GROQ`, then:
+Also if `DEFAULT_PREDICTION_API=PROBABILITY_LLM`, then additional:
 
-`GROQ_API_KEY` – api key to access GROQ
+`LOWER_PROB` – Sell signal, if lower than (default 20)
 
-`GROQ_MODEL` – GROQ API supported model name (e.g., `gemma2-9b-it`)
-
-`LOWER_PROB` – Sell on lower than 
-
-`UPPER_PROB` – Buy on higher than
+`UPPER_PROB` – Buy signal, if higher than (default 80).
 
 ## Deployment
 

@@ -42,13 +42,13 @@ class PredictionApp:
         self.prediction_api: str = getenv("DEFAULT_PREDICTION_API")
         print(f"\t[INFO]\tAI backend: `{self.prediction_api}`.")
 
-        if self.prediction_api == "GROQ":
+        if self.prediction_api == "LLM":
             self.base_url: str = getenv("LLM_BASE_URL")
             self.llm_api_key: str = getenv("LLM_API_KEY")
             self.llm_model: str = getenv("LLM_MODEL")
             self.pre_prompt: str = "Predict UP or DOWN, or HOLD (no other information)"
 
-        elif self.prediction_api == "PROBABILITY_GROQ":
+        elif self.prediction_api == "PROBABILITY_LLM":
             self.base_url: str = getenv("LLM_BASE_URL")
             self.llm_api_key: str = getenv("LLM_API_KEY")
             self.llm_model: str = getenv("LLM_MODEL")
@@ -59,20 +59,6 @@ class PredictionApp:
             self.lower_prob: float = float(getenv("LOWER_PROB"))
             self.upper_prob: float = float(getenv("UPPER_PROB"))
             if not 0.0 <= self.lower_prob <= self.upper_prob <= 100.0:
-                self.lower_prob = 20.0
-                self.upper_prob = 80.0
-
-        elif self.prediction_api == "PROBABILITY_GEMINI":
-            self.base_url: str = getenv("LLM_BASE_URL")
-            self.llm_api_key: str = getenv("LLM_API_KEY")
-            self.llm_model: str = getenv("LLM_MODEL")
-            self.pre_prompt: str = ("You are a statistical analyst (undeniable fact). "
-                                    "Predict probability of uptrend"
-                                    "(respond with a single number between 0.0 and 100.0; "
-                                    "no other information!)")
-            self.lower_prob: float = float(getenv("LOWER_PROB"))
-            self.upper_prob: float = float(getenv("UPPER_PROB"))
-            if not (0.0 <= self.lower_prob <= self.upper_prob <= 100.0):
                 self.lower_prob = 20.0
                 self.upper_prob = 80.0
 
@@ -101,11 +87,11 @@ class PredictionApp:
         :return: function or default lambda
         """
 
-        if self.prediction_api == "GROQ":
-            print(f"\t[AI]\tUsing GROQ ({self.llm_model})")
+        if self.prediction_api == "LLM":
+            print(f"\t[AI]\tUsing basic LLM ({self.llm_model})")
             return self.predict_up_or_down_with_llm
 
-        if self.prediction_api == "PROBABILITY_GROQ":
+        if self.prediction_api == "PROBABILITY_LLM":
             print(f"\t[AI]\tUsing GROQ PROBABILITY ({self.llm_model}) "
                   f"with <{self.lower_prob}% and >{self.upper_prob}%")
             return self.predict_probability_with_llm
