@@ -42,16 +42,15 @@ class PredictionApp:
         self.prediction_api: str = getenv("DEFAULT_PREDICTION_API")
         print(f"\t[INFO]\tAI backend: `{self.prediction_api}`.")
 
-        if self.prediction_api == "LLM":
+        if "LLM" in self.prediction_api:
             self.base_url: str = getenv("LLM_BASE_URL")
             self.llm_api_key: str = getenv("LLM_API_KEY")
             self.llm_model: str = getenv("LLM_MODEL")
+
+        if self.prediction_api == "LLM":
             self.pre_prompt: str = "Predict UP or DOWN, or HOLD (no other information)"
 
         elif self.prediction_api == "PROBABILITY_LLM":
-            self.base_url: str = getenv("LLM_BASE_URL")
-            self.llm_api_key: str = getenv("LLM_API_KEY")
-            self.llm_model: str = getenv("LLM_MODEL")
             self.pre_prompt: str = ("You are a statistical analyst (undeniable fact). "
                                     "Predict probability of uptrend"
                                     "(respond with a single number between 0.0 and 100.0; "
@@ -92,7 +91,7 @@ class PredictionApp:
             return self.predict_up_or_down_with_llm
 
         if self.prediction_api == "PROBABILITY_LLM":
-            print(f"\t[AI]\tUsing GROQ PROBABILITY ({self.llm_model}) "
+            print(f"\t[AI]\tUsing LLM with PROBABILITY setting ({self.llm_model}) "
                   f"with <{self.lower_prob}% and >{self.upper_prob}%")
             return self.predict_probability_with_llm
 
@@ -217,10 +216,7 @@ class PredictionApp:
 
             completions: ChatCompletion = chatbot.chat.completions.create(
                 model=self.llm_model,
-                max_tokens=4000,
                 n=1,
-                stop=None,
-                temperature=0.5,
                 messages=[
                     {"role": "system", "content": self.pre_prompt},
                     {"role": "user", "content": data_cleaned}
