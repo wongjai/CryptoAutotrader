@@ -141,7 +141,7 @@ class App:
 
         else:
 
-            print(f"\t[ACTION DONE]\t🤝 Place a limit {Color.BOLD}{buy_or_sell} order{Color.END}"
+            print(f"[ACTION DONE]\t🤝 Place a limit {Color.BOLD}{buy_or_sell} order{Color.END}"
                   f" of {Color.BOLD}{self.base_asset.lower()}{amount}{Color.END} x"
                   f" {self.quote_asset.lower()}{price} ≈ {self.quote_asset.lower()}{transaction_cost}")
             return order_id
@@ -272,7 +272,7 @@ class App:
                     price=price_buy
                 )
                 if new_order:
-                    print(f"\t[ORDER]\tNew buy order placed with id: {new_order.get("id")}")
+                    print(f"\t[ORDER]\tBuy order id: {new_order.get("id")}")
 
             # If bearish
             elif prediction_main == "down":
@@ -291,7 +291,7 @@ class App:
                 )
 
                 if new_order:
-                    print(f"\t[ORDER]\tNew sell order placed: {new_order.get("id")}")
+                    print(f"\t[ORDER]\tSell order id: {new_order.get("id")}")
 
             # If indecisive
             elif prediction_main == "hold":
