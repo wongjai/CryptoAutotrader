@@ -111,8 +111,8 @@ their portfolio, before an order can be placed (If that isn't the case, the scri
 
 ### Predictive module variables
 
-*(easier to create a new `llm.env` or `probability.env`, or `pandas.env` as per [example 1](llm.env.example)
-[example 2](probability_llm.env.example), or [example 3](pandas.env.example), that have included explanations for each variable, as well)*
+*(easier to create a new `llm.env` or `probability.env`, or `pandas.env` as per [example 1](llm.env.example) or 
+[example 2](probability_llm.env.example), or [example 3](pandas.env.example))*
 
 `DEFAULT_PREDICTION_API` – either `LLM` or `PROBABILITY_LLM`, or `PANDAS` is supported
 
