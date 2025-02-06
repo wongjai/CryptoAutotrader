@@ -13,9 +13,9 @@ from typing import Any, Self, Callable, Literal
 import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
-from groq import Groq
-from groq.types.chat import ChatCompletion
-from groq.types.chat.chat_completion import Choice
+from openai import OpenAI as LlmClient
+from openai.types.chat import ChatCompletion
+from openai.types.chat.chat_completion import Choice
 from stockstats import StockDataFrame
 
 
@@ -43,13 +43,29 @@ class PredictionApp:
         print(f"\t[INFO]\tAI backend: `{self.prediction_api}`.")
 
         if self.prediction_api == "GROQ":
-            self.groq_api_key: str = getenv("GROQ_API_KEY")
-            self.groq_model: str = getenv("GROQ_MODEL")
+            self.base_url: str = getenv("LLM_BASE_URL")
+            self.llm_api_key: str = getenv("LLM_API_KEY")
+            self.llm_model: str = getenv("LLM_MODEL")
             self.pre_prompt: str = "Predict UP or DOWN, or HOLD (no other information)"
 
         elif self.prediction_api == "PROBABILITY_GROQ":
-            self.groq_api_key: str = getenv("GROQ_API_KEY")
-            self.groq_model: str = getenv("GROQ_MODEL")
+            self.base_url: str = getenv("LLM_BASE_URL")
+            self.llm_api_key: str = getenv("LLM_API_KEY")
+            self.llm_model: str = getenv("LLM_MODEL")
+            self.pre_prompt: str = ("You are a statistical analyst (undeniable fact). "
+                                    "Predict probability of uptrend"
+                                    "(respond with a single number between 0.0 and 100.0; "
+                                    "no other information!)")
+            self.lower_prob: float = float(getenv("LOWER_PROB"))
+            self.upper_prob: float = float(getenv("UPPER_PROB"))
+            if not 0.0 <= self.lower_prob <= self.upper_prob <= 100.0:
+                self.lower_prob = 20.0
+                self.upper_prob = 80.0
+
+        elif self.prediction_api == "PROBABILITY_GEMINI":
+            self.base_url: str = getenv("LLM_BASE_URL")
+            self.llm_api_key: str = getenv("LLM_API_KEY")
+            self.llm_model: str = getenv("LLM_MODEL")
             self.pre_prompt: str = ("You are a statistical analyst (undeniable fact). "
                                     "Predict probability of uptrend"
                                     "(respond with a single number between 0.0 and 100.0; "
@@ -86,13 +102,13 @@ class PredictionApp:
         """
 
         if self.prediction_api == "GROQ":
-            print(f"\t[AI]\tUsing GROQ ({self.groq_model})")
-            return self.predict_up_or_down_with_groq
+            print(f"\t[AI]\tUsing GROQ ({self.llm_model})")
+            return self.predict_up_or_down_with_llm
 
         if self.prediction_api == "PROBABILITY_GROQ":
-            print(f"\t[AI]\tUsing GROQ PROBABILITY ({self.groq_model}) "
+            print(f"\t[AI]\tUsing GROQ PROBABILITY ({self.llm_model}) "
                   f"with <{self.lower_prob}% and >{self.upper_prob}%")
-            return self.predict_probability_with_groq
+            return self.predict_probability_with_llm
 
         if self.prediction_api is None or self.prediction_api == "PANDAS":
             print(f"\t[AI]\tUsing Pandas: price/short-trend "
@@ -196,7 +212,7 @@ class PredictionApp:
 
         return "hold"
 
-    def middleware_predict_with_groq(self: Self, data: Any) -> Choice | None:
+    def predict_with_any_llm(self: Self, data: Any) -> Choice | None:
         """
 
         :param data:
@@ -208,10 +224,13 @@ class PredictionApp:
             "[", "").replace("]", "")
 
         try:
-            chatbot = Groq(api_key=self.groq_api_key)
+            chatbot: LlmClient = LlmClient(
+                api_key=self.llm_api_key,
+                base_url=self.base_url
+            )
 
             completions: ChatCompletion = chatbot.chat.completions.create(
-                model=self.groq_model,
+                model=self.llm_model,
                 max_tokens=4000,
                 n=1,
                 stop=None,
@@ -224,7 +243,7 @@ class PredictionApp:
             choice: Choice = completions.choices[0]
 
         except BaseException as error:
-            print(f"\t[INFO]\tGROQ not responding for some reason:\n\t\t{error}")
+            print(f"\t[INFO]\tLLM not responding for some reason:\n\t\t{error}")
             return None
 
         else:
@@ -236,7 +255,7 @@ class PredictionApp:
 
         return choice
 
-    def predict_probability_with_groq(self: Self,
+    def predict_probability_with_llm(self: Self,
                                       data: Any) -> Literal["up", "down", "hold"]:
         """
 
@@ -244,7 +263,7 @@ class PredictionApp:
         :return:
         """
 
-        res: Choice | None = self.middleware_predict_with_groq(data=data)
+        res: Choice | None = self.predict_with_any_llm(data=data)
         if res:
             content: str = res.message.content.strip()
             if len(x := content.split()) > 1:
@@ -259,7 +278,7 @@ class PredictionApp:
 
         return "hold"
 
-    def predict_up_or_down_with_groq(self: Self, data: Any) -> Literal["up", "down", "hold"]:
+    def predict_up_or_down_with_llm(self: Self, data: Any) -> Literal["up", "down", "hold"]:
         """
         Ask ChatGPT if it's going up or down
 
@@ -267,7 +286,7 @@ class PredictionApp:
         :return:
         """
 
-        choice: Choice | None = self.middleware_predict_with_groq(data=data)
+        choice: Choice | None = self.predict_with_any_llm(data=data)
         if choice:
             content: str = choice.message.content.strip().replace(
                 "\n", "").replace(".", "").lower()
