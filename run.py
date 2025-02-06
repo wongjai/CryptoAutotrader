@@ -2,8 +2,8 @@
 Main bot module
 
 @Developer: Stan
-@AppVersion: 3.1.2
-@ModuleVersion: 3.1.2
+@AppVersion: 3.1.3
+@ModuleVersion: 3.1.3
 @PythonVersion: 3.13
 
 """
@@ -390,7 +390,7 @@ class App:
 
 
 if __name__ == "__main__":
-    PREDICTION_ENVIRONMENT_FILENAME: str = "probability.env"
+    PREDICTION_ENVIRONMENT_FILENAME: str = "probability_llm.env"
     MAIN_ENVIRONMENT_FILENAME: str = "main.env"
     print("[START]\tSTARTED `main` module.")
 

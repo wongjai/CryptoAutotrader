@@ -2,7 +2,7 @@
 Prediction module
 
 @Developer: Stan
-@ModuleVersion: 2.1.1
+@ModuleVersion: 3.1.3
 @PythonVersion: 3.13
 
 """
