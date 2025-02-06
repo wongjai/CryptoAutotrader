@@ -247,15 +247,8 @@ This software is heavily reliant on the following masterpieces of programming:
   date: Jan 27, 2025)
 * [stockstats library](https://github.com/jealous/stockstats) with
   their [LICENSE](https://github.com/jealous/stockstats/blob/master/LICENSE.txt) (to date: Jan 27, 2025)
-* [groq library](https://github.com/groq/groq-python) with
-  their [LICENSE](https://github.com/groq/groq-python/blob/main/LICENSE) (to date: Jan 27, 2025)
-
-<a href="https://groq.com" target="_blank" rel="noopener noreferrer">
-  <img
-    src="https://groq.com/wp-content/uploads/2024/03/PBG-mark1-color.svg"
-    alt="Powered by Groq for fast inference." width=50
-/>
-</a>
+* [openai library](https://github.com/openai/openai-python) with
+  their [LICENSE](https://github.com/openai/openai-python/blob/main/LICENSE) (to date: Feb 6, 2025)
 
 ## Appendix
 
