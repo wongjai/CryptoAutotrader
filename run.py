@@ -271,7 +271,8 @@ class App:
                     amount=amount_buy,
                     price=price_buy
                 )
-                print(f"\t[ORDER]\tNew buy order placed with id: {new_order.get("id")}")
+                if new_order:
+                    print(f"\t[ORDER]\tNew buy order placed with id: {new_order.get("id")}")
 
             # If bearish
             elif prediction_main == "down":
@@ -289,7 +290,8 @@ class App:
                     price=price_sell
                 )
 
-                print(f"\t[ORDER]\tNew sell order placed: {new_order.get("id")}")
+                if new_order:
+                    print(f"\t[ORDER]\tNew sell order placed: {new_order.get("id")}")
 
             # If indecisive
             elif prediction_main == "hold":
