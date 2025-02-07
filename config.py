@@ -3,12 +3,15 @@ Configuration file. Must be version-controlled.
 
 """
 
+from enum import Enum
 
-class Color:
+
+class Color(Enum):
     """Colors to alter console output"""
+
     PURPLE: str = "\033[95m"
     CYAN: str = "\033[96m"
-    DARKCYAN: str = "\033[36m"
+    DARK_CYAN: str = "\033[36m"
     BLUE: str = "\033[94m"
     GREEN: str = "\033[92m"
     YELLOW: str = "\033[93m"

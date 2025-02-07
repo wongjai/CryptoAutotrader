@@ -214,7 +214,7 @@ class App:
 
         self.cancel_order_counter += 1
         print(f"\t[INFO]\t💪🏻 {Color.ITALIC}Current open orders counter:{Color.END}"
-              f" {Color.BOLD}{Color.DARKCYAN}{self.cancel_order_counter}{Color.END}.")
+              f" {Color.BOLD}{Color.DARK_CYAN}{self.cancel_order_counter}{Color.END}.")
 
         if self.cancel_order_counter == self.cancel_order_limit:
             self.cancel_order_counter = 0
@@ -322,11 +322,11 @@ class App:
 
         print(f"\t[INFO]\t🏦 Exchange: `{self.exchange_name}`.\n"
               "\t[INFO]\t💼 Algorithm trust percentage (reinvestment rate): "
-              f"{Color.DARKCYAN}{self.algorithm_trust_percentage * 100}%{Color.END}.\n"
+              f"{Color.DARK_CYAN}{self.algorithm_trust_percentage * 100}%{Color.END}.\n"
               "\t[INFO]\t📈 Algorithm premium: "
-              f"{Color.DARKCYAN}{round(self.premium * 100, 4)}%{Color.END}.\n"
+              f"{Color.DARK_CYAN}{round(self.premium * 100, 4)}%{Color.END}.\n"
               "\t[INFO]\t📉 Lower limit: "
-              f"{Color.DARKCYAN}{self.min_transaction_value_in_base} "
+              f"{Color.DARK_CYAN}{self.min_transaction_value_in_base} "
               f"{self.base_asset}{Color.END}.\n\n"
               f"\t[INFO]\t🚀 Started algorithm with pair `{self.symbol}`.")
 
