@@ -27,6 +27,8 @@ This software is open source under a permissive [License](LICENSE), and it's FRE
 
 ## Features
 
+* **UPDATED**: New test mode is added to only test the prediction API – no trades would be made. Suitable for LLM APIs (Pandas – not so much).
+
 * This script endlessly places buy and sell orders based on predictive modeling (with 'smart' calculations of price and
   amount, see function `prepare_order` of class `App` in module [run.py](run.py)):
 
@@ -179,13 +181,31 @@ The required packages are installed with:
 
 Run from inside project directory:
 
-    python3 run.py
+Required:
+
+Specify either `run` or `test` command to run the script in main mode or test mode, respectively.
+
+Optional arguments: 
+* `-p` or `--predictions` – specify `.env` file with prediction API needed info
+* `-e` or `--env` – specify `.env` file with exchange API needed info
+
+
+    python3 run.py run -e main.env -p probability_llm.env
 
 Alternatively run from outside project directory (change `<path_to_`run.py`>` to actual path):
 
-    sudo python3 <path_to_`run.py`>
+    sudo python3 <path_to_`run.py`> run -e main.env -p probability_llm.env
 
 *Administrator password might be prompted to enter*
+
+***Run in test mode***:
+
+    python3 run.py test -p probability_llm.env
+
+***Run in test mode (outside project directory)***:
+
+    sudo python3 <path_to_`run.py`> test -p probability_llm.env
+
 
 ### Windows
 
@@ -193,7 +213,7 @@ Untested. Windows users must be smart enough to figure out the quirks.
 
 ### Docker
 
-Untested, but flawless deployment is probable. The [.Dockerfile](.Dockerfile) is shipped with essential commands.
+Untested! The [.Dockerfile](.Dockerfile) is shipped with essential commands.
 
 ## License
 
