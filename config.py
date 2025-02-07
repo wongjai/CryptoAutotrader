@@ -3,10 +3,11 @@ Configuration file. Must be version-controlled.
 
 """
 
-from enum import Enum
+from dataclasses import dataclass
 
 
-class Color(Enum):
+@dataclass
+class Color:
     """Colors to alter console output"""
 
     PURPLE: str = "\033[95m"
