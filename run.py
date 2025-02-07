@@ -2,12 +2,13 @@
 Main bot module
 
 @Developer: Stan
-@AppVersion: 3.1.3
-@ModuleVersion: 3.1.3
+@AppVersion: 3.2.0
+@ModuleVersion: 3.2.0
 @PythonVersion: 3.13
 
 """
 
+import argparse
 import sys
 from datetime import datetime
 from os import getenv, PathLike
@@ -396,22 +397,90 @@ class App:
 
 
 if __name__ == "__main__":
-    PREDICTION_ENVIRONMENT_FILENAME: str = "probability_llm.env"
-    MAIN_ENVIRONMENT_FILENAME: str = "main.env"
-    print("[START]\tSTARTED `main` module.")
+    CONSOLE_ARGUMENTS_PARSER = argparse.ArgumentParser(
+        prog="run.py",
+        description="run.py will place trades in accordance with specified parameters. "
+                    "Use with `test` command to only run default data through prediction API;"
+                    "use with `run` command to run main functionality.",
+        epilog="Extremely caution is advised, "
+               "don't run the program unless knowing EXACTLY what will happen."
+    )
+
+    # TEST DATA (For LLM API. Pandas won't necessarily be so predictable)
+    # Data for uptrend
+    DEFAULT_DATA_TO_TEST_API_UP = [
+        ["2020-03-10 12:04:00", 1, 1, 1, 1, 10],
+        ["2020-03-10 12:04:01", 2, 2, 2, 2, 10],
+        ["2020-03-10 12:04:02", 3, 3, 3, 3, 10],
+        ["2020-03-10 12:04:03", 4, 4, 4, 4, 10],
+        ["2020-03-10 12:04:04", 5, 5, 5, 5, 10],
+    ]
+    # Data for downtrend
+    DEFAULT_DATA_TO_TEST_API_DOWN = [
+        ["2020-03-10 12:04:00", 10, 10, 10, 10, 10],
+        ["2020-03-10 12:04:01", 2, 2, 2, 2, 10],
+        ["2020-03-10 12:04:02", 0.3, 0.3, 0.3, 0.3, 10],
+        ["2020-03-10 12:04:03", 0.03, 0.03, 0.03, 0.03, 10],
+        ["2020-03-10 12:04:04", 0.003, 0.003, 0.003, 0.003, 10],
+    ]
+    DEFAULT_MAIN_ENVIRONMENT_FILENAME = "main.env"
+    DEFAULT_PREDICTION_ENVIRONMENT_FILENAME = "probability_llm.env"
+    SUBPARSERS = CONSOLE_ARGUMENTS_PARSER.add_subparsers(
+        dest="running_mode",
+        required=True
+    )
+
+    PARSER_TEST_PREDICT_API = SUBPARSERS.add_parser("test")
+    PARSER_TEST_PREDICT_API.add_argument(
+        "-p", "--predictions",
+        default=DEFAULT_PREDICTION_ENVIRONMENT_FILENAME,
+        type=str,
+        required=False,
+    )
+
+    PARSER_RUN = SUBPARSERS.add_parser("run")
+    PARSER_RUN.add_argument(
+        "-e", "--env",
+        default=DEFAULT_MAIN_ENVIRONMENT_FILENAME,
+        type=str,
+        required=False,
+    )
+    PARSER_RUN.add_argument(
+        "-p", "--predictions",
+        default=DEFAULT_PREDICTION_ENVIRONMENT_FILENAME,
+        type=str,
+        required=False,
+    )
+
+    console = CONSOLE_ARGUMENTS_PARSER.parse_args()
+    mode = console.running_mode
 
     # Paths
     current_path: str | PathLike = dirname(abspath(__file__))
-    predictions_env_path: str | PathLike = join(current_path, PREDICTION_ENVIRONMENT_FILENAME)
-    main_trading_env_path: str | PathLike = join(current_path, MAIN_ENVIRONMENT_FILENAME)
+    predictions_env_path: str | PathLike = join(current_path, console.predictions)
 
     # Predictions
     prediction_app: PredictionApp = PredictionApp(env_file_path=predictions_env_path)
     prediction_function: Callable[[Any], str] = prediction_app.predict_up_or_down
 
-    # Main logic
-    kucoin_trading_bot: App = App(
-        prediction_api=prediction_function,
-        env_file_path=main_trading_env_path
-    )
-    sys.exit(kucoin_trading_bot.main(infinite_loop_condition=True))
+    match mode:
+        case "run":
+            print("[START]\tSTARTED module in `run` mode.")
+            main_trading_env_path = join(current_path, console.env)
+
+            # Main logic
+            kucoin_trading_bot: App = App(
+                prediction_api=prediction_function,
+                env_file_path=main_trading_env_path
+            )
+
+            sys.exit(kucoin_trading_bot.main(infinite_loop_condition=True))
+
+        case "test":
+            print("[START]\tSTARTED module in `test` mode.")
+            print("\t[INFO]\tUptrend recognized ?",
+                  prediction_function(DEFAULT_DATA_TO_TEST_API_UP))
+            print("\t[INFO]\tDowntrend recognized ?",
+                  prediction_function(DEFAULT_DATA_TO_TEST_API_DOWN))
+            sys.exit(print("[END] Test mode exited."))
+
