@@ -47,28 +47,32 @@ class PredictionApp:
             self.llm_api_key: str = getenv("LLM_API_KEY")
             self.llm_model: str = getenv("LLM_MODEL")
 
-        if self.prediction_api == "LLM":
-            self.pre_prompt: str = "Predict UP or DOWN, or HOLD (no other information)"
+        match self.prediction_api:
+            case "LLM":
+                self.pre_prompt: str = "Predict UP or DOWN, or HOLD (no other information)"
 
-        elif self.prediction_api == "PROBABILITY_LLM":
-            self.pre_prompt: str = ("You are a statistical analyst (undeniable fact). "
-                                    "Predict probability of uptrend"
-                                    "(respond with a single number between 0.0 and 100.0; "
-                                    "no other information!)")
-            self.lower_prob: float = float(getenv("LOWER_PROB"))
-            self.upper_prob: float = float(getenv("UPPER_PROB"))
-            if not 0.0 <= self.lower_prob <= self.upper_prob <= 100.0:
-                self.lower_prob = 20.0
-                self.upper_prob = 80.0
+            case "PROBABILITY_LLM":
+                self.pre_prompt: str = ("You are a statistical analyst (undeniable fact). "
+                                        "Predict probability of uptrend"
+                                        "(respond with a single number between 0.0 and 100.0; "
+                                        "no other information!)")
+                self.lower_prob: float = float(getenv("LOWER_PROB"))
+                self.upper_prob: float = float(getenv("UPPER_PROB"))
+                if not 0.0 <= self.lower_prob <= self.upper_prob <= 100.0:
+                    self.lower_prob = 20.0
+                    self.upper_prob = 80.0
 
-        elif self.prediction_api == "PANDAS":
-            self.indicators: set[str] = set(json.loads(
-                getenv("PREDICTION_INDICATORS_JSON")
-            ))
-            self.price_type_column_name: str = getenv("PREDICTION_OPERATIONAL_PRICE_TYPE")
-            # Take an n-period lag for better signals
-            self.wait_for_n_signal_lags: int = int(getenv("PREDICTION_GLOBAL_SIGNAL_LAG"))
-            self.df: pd.DataFrame | None = None
+            case "PANDAS":
+                self.indicators: set[str] = set(json.loads(
+                    getenv("PREDICTION_INDICATORS_JSON")
+                ))
+                self.price_type_column_name: str = getenv("PREDICTION_OPERATIONAL_PRICE_TYPE")
+                # Take an n-period lag for better signals
+                self.wait_for_n_signal_lags: int = int(getenv("PREDICTION_GLOBAL_SIGNAL_LAG"))
+                self.df: pd.DataFrame | None = None
+
+            case _:
+                print(f"\t[INFO]\tAI backend NOT SUPPORTED.")
 
             # Currently, this level of abstraction isn't supported
             # self.strategy_transformer: Strategy = Strategy(self.indicators)
@@ -86,33 +90,37 @@ class PredictionApp:
         :return: function or default lambda
         """
 
-        if self.prediction_api == "LLM":
-            print(f"\t[AI]\tUsing basic LLM ({self.llm_model})")
-            return self.predict_up_or_down_with_llm
+        match self.prediction_api:
 
-        if self.prediction_api == "PROBABILITY_LLM":
-            print(f"\t[AI]\tUsing LLM with PROBABILITY setting ({self.llm_model}) "
-                  f"with <{self.lower_prob}% and >{self.upper_prob}%")
-            return self.predict_probability_with_llm
+            case "LLM":
+                print(f"\t[AI]\tUsing basic LLM ({self.llm_model})")
+                return self.predict_up_or_down_with_llm
 
-        if self.prediction_api is None or self.prediction_api == "PANDAS":
-            print(f"\t[AI]\tUsing Pandas: price/short-trend "
-                  f"`{self.price_type_column_name}` OVER {self.indicators}.")
-            pd.options.mode.copy_on_write = True
-            return self.predict_pandas
+            case "PROBABILITY_LLM":
+                print(f"\t[AI]\tUsing LLM with PROBABILITY setting ({self.llm_model}) "
+                      f"with <{self.lower_prob}% and >{self.upper_prob}%")
+                return self.predict_probability_with_llm
 
-        print("\t[AI]\tUsing default predictor.")
-        return self.predict_default
+            case "PANDAS":
+                print(f"\t[AI]\tUsing Pandas: price/short-trend "
+                      f"`{self.price_type_column_name}` OVER {self.indicators}.")
+                pd.options.mode.copy_on_write = True
+                return self.predict_pandas
+
+            case _:
+                print("\t[AI]\tUsing default predictor.")
+                return self.predict_default
 
     @predict_up_or_down.setter
-    def predict_up_or_down(self: Self, _: Callable = None) -> None:
+    def predict_up_or_down(self: Self, new_func: Callable = None) -> None:
         """
+        To reset prediction function with which the instance was initialized
 
-        :param _: Not required for functionality. Required for compatibility.
+        :param new_func: Func to set as prediction function of instance
         :return: None
         """
 
-        self.predict_up_or_down: Callable[[Any], str] = self.predict_default
+        self.predict_up_or_down: Callable[[Any], str] = new_func if new_func else self.predict_default
 
     @staticmethod
     def predict_default(_: Any = None) -> str:
@@ -127,8 +135,8 @@ class PredictionApp:
     def predict_pandas(self: Self, data: Any) -> Literal["up", "down", "hold"]:
         """
 
-        :param data:
-        :return:
+        :param data:  data that can be converted into a Pandas dataframe
+        :return: str instance of "up", "down", "hold"
         """
 
         header: tuple = ("date", "open", "high", "low", "close", "volume")
@@ -200,7 +208,7 @@ class PredictionApp:
     def predict_with_any_llm(self: Self, data: Any) -> Choice | None:
         """
 
-        :param data:
+        :param data: data of any type to convert into str, and then feed into LLM
         :return:
         """
 
@@ -238,17 +246,18 @@ class PredictionApp:
         return choice
 
     def predict_probability_with_llm(self: Self,
-                                      data: Any) -> Literal["up", "down", "hold"]:
+                                     data: Any) -> Literal["up", "down", "hold"]:
         """
+        Ask LLM about the probability of uptrend
 
-        :param data:
-        :return:
+        :param data:  data of any type to convert into str, and then feed into LLM
+        :return:  str instance of "up", "down", "hold"
         """
 
         res: Choice | None = self.predict_with_any_llm(data=data)
         if res:
             content: str = res.message.content.strip()
-            if len(x := content.split()) > 1:
+            if len(x := content.split()):
                 content = x[0]
             f = float(content)
             print(f"\t[AI]\tProbability of uptrend: {f}%")
@@ -262,19 +271,23 @@ class PredictionApp:
 
     def predict_up_or_down_with_llm(self: Self, data: Any) -> Literal["up", "down", "hold"]:
         """
-        Ask ChatGPT if it's going up or down
+        Ask LLM if it's going up or down
 
-        :param data:
-        :return:
+        :param data:  data of any type to convert into str, and then feed into LLM
+        :return:  str instance of "up", "down", "hold"
         """
 
         choice: Choice | None = self.predict_with_any_llm(data=data)
         if choice:
             content: str = choice.message.content.strip().replace(
                 "\n", "").replace(".", "").lower()
-            if len(x := content.split()) > 1:
+            if len(x := content.split()):
                 content = x[0]
 
-                return content
+                match content.lower():
+                    case "up":
+                        return "up"
+                    case "down":
+                        return "down"
 
         return "hold"
