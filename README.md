@@ -29,6 +29,8 @@ This software is open source under a permissive [License](LICENSE), and it's FRE
 
 * **UPDATED**: New test mode is added to only test the prediction API – no trades would be made. Suitable for LLM APIs (Pandas – not so much).
 
+* LLM connection is through an API (any 'openai' library supported API's)
+
 * This script endlessly places buy and sell orders based on predictive modeling (with 'smart' calculations of price and
   amount, see function `prepare_order` of class `App` in module [run.py](run.py)):
 
@@ -107,7 +109,7 @@ additional premium/discount on bid/ask)
 `TIMEFRAME` – Depending on cryptoexchange, this value can be set as either of: `1m`, `3m`, `5m`, `10m`, `15m`, `30m`,
 `4h`, `8h`, `12h`, `1w`. See ccxt docs or exchange API for correct info.
 
-`TRADING_PAIR` – What to spot trade (e. g., `XMR/USDT`). NOTE: One must have both of these two tokens in any amount in
+`TRADING_PAIR` – What to spot trade (e.g., `XMR/USDT`). NOTE: One must have both of these two tokens in any amount in
 their portfolio, before an order can be placed (If that isn't the case, the script will show a
 `ProbablyAIButCouldBeAnything` exception with the ticker of the token one doesn't own).
 
@@ -256,7 +258,7 @@ For new ideas, issues can be opened, but appreciated are emails at crypto.autotr
 This software is heavily reliant on the following masterpieces of programming:
 
 * [ccxt library](https://github.com/ccxt/ccxt) with
-  their [LICENSE](https://github.com/groq/groq-python/blob/main/LICENSE) (to date: Jan 27, 2025)
+  their [LICENSE](https://github.com/ccxt/ccxt/blob/master/LICENSE.txt) (to date: Feb 20, 2025)
 * [Pandas library](https://pandas.pydata.org) with
   their [LICENSE](https://github.com/pandas-dev/pandas/blob/main/LICENSE) (to date: Jan 27, 2025)
 * [NumPy library](https://numpy.org) with their [LICENSE](https://github.com/numpy/numpy/blob/main/LICENSE.txt) (to
