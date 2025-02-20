@@ -163,8 +163,8 @@ Parametrization of this software is achieved via the means of environment variab
 
 #### 2
 
-Link these `.env` files in [Python module run.py](run.py) in the `if __name__ == "__main__":` section as
-`PREDICTION_ENVIRONMENT_FILENAME` and `MAIN_ENVIRONMENT_FILENAME` constants. They don't *have* to be separate files, but
+Link these `.env` files in [Python module run.py](run.py) either as command line arguments, or in the `if __name__ == "__main__":` section as
+`DEFAULT_PREDICTION_ENVIRONMENT_FILENAME` and `DEFAULT_MAIN_ENVIRONMENT_FILENAME` constants. They don't *have* to be separate files, but
 at least **a** filename must be supplied of a file containing the required Environment variables.
 Not specifying a `<something>.env` file would result in scanning the literal file with the path '.env' in the same
 directory as the script.
@@ -234,7 +234,7 @@ I might be available for hire at a random time. Reach out with offers via email 
 If you'd like to support my endeavors (or my lifestyle, in general), in accordance with the nature and character of this
 software, I accept donations in one truly CRYPTO currency –[Monero (XMR)](https://www.getmonero.org) at addresses:
 
-* `4BDMZQaXRYMUE8PBBddmPRTEV4TSQ4ecpY8u7ZKCRFT6DTKCjJsqCzi7st5XWa47CTAad5mXemkFoJnjW16of7GwPpgtsnB`
+* `83woV72JcSXiPfrddb25znWiPULtkwFmZVXdPGkvNj6DArk3LUxedsG71A7ErK5cRHBTJPpjSorEz6j5sCJs1C1gCjmagaL`
 
 Monero is also the default crypto for this **Crypto Autotrader** to spot-trade.
 
