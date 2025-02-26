@@ -25,6 +25,7 @@ class Color:
 
 @dataclass
 class TestData:
+    __test__ = False
     # TEST DATA (For LLM API. Pandas won't necessarily be so predictable)
     # Data for uptrend
     DEFAULT_DATA_TO_TEST_API_UP = [
