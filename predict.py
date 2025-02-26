@@ -35,7 +35,7 @@ class PredictionApp:
         """
 
         # If .env filepath is supplied, use it. Or else '.env' is used.
-        env_file_path = env_file_path or ".env"
+        # env_file_path = env_file_path or ".env"
         _config: dict = dotenv_values(env_file_path)
 
         self.prediction_api: str = _config.get("DEFAULT_PREDICTION_API")
