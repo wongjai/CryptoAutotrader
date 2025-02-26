@@ -28,4 +28,4 @@ jobs:
         continue-on-error: true
       - name: Generate Coverage Report
         run: |
-          coverage report -m
+          pip install coverage && coverage report -m

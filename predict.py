@@ -36,7 +36,11 @@ class PredictionApp:
 
         # If .env filepath is supplied, use it. Or else '.env' is used.
         env_file_path = env_file_path or ".env"
-        _config: dict = dotenv_values(env_file_path)
+        _config: dict = {
+            **dotenv_values(".env.shared"),  # load shared development variables
+            **dotenv_values(".env.secret"),  # load sensitive variables
+            **dotenv_values(env_file_path)  # override GitHub Actions
+        }
 
         self.prediction_api: str = _config.get("DEFAULT_PREDICTION_API")
         print(f"\t[INFO]\tAI backend: `{self.prediction_api}`.")
