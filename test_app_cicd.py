@@ -1,5 +1,5 @@
 """
-Test classes. Version controlled and CI/CD specific (GitHub secrets required!).
+Test classes. Version controlled and CI/CD specific (GitHub secret required!).
 """
 
 import os
@@ -7,7 +7,10 @@ import os
 from config import TestData
 from predict import PredictionApp
 
+
 class TestLLM:
+    os.environ["LLM_MODEL"] = "gemini-2.0-flash"
+    os.environ["LLM_BASE_URL"] = "https://generativelanguage.googleapis.com/v1beta"
 
     def test_any(self):
         """
@@ -15,8 +18,9 @@ class TestLLM:
         :return:
         """
         os.environ["DEFAULT_PREDICTION_API"] = "PROBABILITY_LLM"
-        prediction_app = PredictionApp("probability_llm.env")
+        prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_with_any_llm
+
         assert prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_UP) is not None, \
             "Couldn't get prediction"
 
@@ -26,8 +30,9 @@ class TestLLM:
         :return:
         """
         os.environ["DEFAULT_PREDICTION_API"] = "PROBABILITY_LLM"
-        prediction_app = PredictionApp("probability_llm.env")
+        prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_probability_with_llm
+
         assert prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_UP) == "up", \
             "Incorrect prediction"
 
@@ -37,21 +42,24 @@ class TestLLM:
         :return:
         """
         os.environ["DEFAULT_PREDICTION_API"] = "PROBABILITY_LLM"
-        prediction_app = PredictionApp("probability_llm.env")
+        prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_probability_with_llm
+
         assert prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_DOWN) == "down", \
             "Incorrect prediction"
 
     def test_basic_up(self):
         os.environ["DEFAULT_PREDICTION_API"] = "LLM"
-        prediction_app = PredictionApp("llm.env")
+        prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_up_or_down
+
         assert prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_UP) == "up", \
             "Incorrect prediction"
 
     def test_basic_down(self):
         os.environ["DEFAULT_PREDICTION_API"] = "LLM"
-        prediction_app = PredictionApp("llm.env")
+        prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_up_or_down
+
         assert prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_DOWN) == "down", \
             "Incorrect prediction"
