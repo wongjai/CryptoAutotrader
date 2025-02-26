@@ -1,0 +1,6 @@
+*.env
+/future_ideas
+/images/logo.jpg
+.idea
+.venv
+*.toml
