@@ -9,8 +9,9 @@ from predict import PredictionApp
 
 
 class TestLLM:
-    os.environ["LLM_MODEL"] = "gemini-2.0-flash"
-    os.environ["LLM_BASE_URL"] = "https://generativelanguage.googleapis.com/v1beta"
+    """
+    Test LLM API predictions (5/5 passed expected, however at least 1/5 is fine)
+    """
 
     def test_any(self):
         """
