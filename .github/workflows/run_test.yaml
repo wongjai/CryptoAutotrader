@@ -23,6 +23,7 @@ jobs:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           LLM_BASE_URL: ${{ env.LLM_BASE_URL }}
           LLM_MODEL: ${{ env.LLM_MODEL }}
+          DEFAULT_PREDICTION_API: ${{ env.DEFAULT_PREDICTION_API }}
         run: |
           pip install pytest && pytest test_app_cicd.py
         continue-on-error: true
