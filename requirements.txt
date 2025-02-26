@@ -4,3 +4,4 @@ python-dotenv~=1.0.1
 stockstats~=0.6.3
 numpy~=2.2.1
 openai~=1.61.1
+pytest~=8.3.4
