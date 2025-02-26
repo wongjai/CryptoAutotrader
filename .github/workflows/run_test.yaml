@@ -2,6 +2,12 @@ name: Run Unit Test via Pytest
 
 on: [ push ]
 
+env:
+  LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+  LLM_BASE_URL: ${{ env.LLM_BASE_URL }}
+  LLM_MODEL: ${{ env.LLM_MODEL }}
+  DEFAULT_PREDICTION_API: ${{ env.DEFAULT_PREDICTION_API }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,22 +17,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip && pip install -r requirements.txt
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+
       - name: Test with pytest
-        env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_BASE_URL: ${{ env.LLM_BASE_URL }}
-          LLM_MODEL: ${{ env.LLM_MODEL }}
-          DEFAULT_PREDICTION_API: ${{ env.DEFAULT_PREDICTION_API }}
-        run: |
-          pip install pytest && pytest test_app_cicd.py
+        run: pip install pytest && pytest test_app_cicd.py
         continue-on-error: true
+
       - name: Generate Coverage Report
-        run: |
-          pip install coverage && coverage report -m
+        run: pip install coverage && coverage report -m
