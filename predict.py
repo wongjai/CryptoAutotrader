@@ -56,8 +56,8 @@ class PredictionApp:
                                         "Predict probability of uptrend"
                                         "(respond with a single number between 0.0 and 100.0; "
                                         "no other information!)")
-                self.lower_prob: float = float(getenv("LOWER_PROB"))
-                self.upper_prob: float = float(getenv("UPPER_PROB"))
+                self.lower_prob: float = float(getenv("LOWER_PROB") or 20)
+                self.upper_prob: float = float(getenv("UPPER_PROB") or 80)
                 if not 0.0 <= self.lower_prob <= self.upper_prob <= 100.0:
                     self.lower_prob = 20.0
                     self.upper_prob = 80.0
