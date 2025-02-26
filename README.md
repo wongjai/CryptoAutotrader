@@ -191,7 +191,6 @@ Optional arguments:
 * `-p` or `--predictions` – specify `.env` file with prediction API needed info
 * `-e` or `--env` – specify `.env` file with exchange API needed info
 
-
     python3 run.py run -e main.env -p probability_llm.env
 
 Alternatively run from outside project directory (change `<path_to_`run.py`>` to actual path):
