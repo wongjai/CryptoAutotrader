@@ -2,7 +2,7 @@
 Test classes. Version controlled and CI/CD specific (GitHub secret required!).
 """
 
-import os
+import pytest
 
 from config import TestData
 from predict import PredictionApp
