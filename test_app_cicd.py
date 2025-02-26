@@ -13,6 +13,7 @@ class TestLLM:
     Test LLM API predictions (5/5 passed expected, however at least 1/5 is fine)
     """
 
+
     def test_any(self):
         """
         Run abstract LLM prediction on test data (check if not None)

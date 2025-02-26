@@ -7,12 +7,11 @@ Prediction module
 
 """
 import json
-from os import getenv
 from typing import Any, Self, Callable, Literal
 
 import numpy as np
 import pandas as pd
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 from openai import OpenAI as LlmClient
 from openai.types.chat import ChatCompletion
 from openai.types.chat.chat_completion import Choice
@@ -37,15 +36,15 @@ class PredictionApp:
 
         # If .env filepath is supplied, use it. Or else '.env' is used.
         env_file_path = env_file_path or ".env"
-        load_dotenv(dotenv_path=env_file_path)
+        _config: dict = dotenv_values(env_file_path)
 
-        self.prediction_api: str = getenv("DEFAULT_PREDICTION_API")
+        self.prediction_api: str = _config.get("DEFAULT_PREDICTION_API")
         print(f"\t[INFO]\tAI backend: `{self.prediction_api}`.")
 
         if "LLM" in self.prediction_api:
-            self.base_url: str = getenv("LLM_BASE_URL")
-            self.llm_api_key: str = getenv("LLM_API_KEY")
-            self.llm_model: str = getenv("LLM_MODEL")
+            self.base_url: str = _config.get("LLM_BASE_URL")
+            self.llm_api_key: str = _config.get("LLM_API_KEY")
+            self.llm_model: str = _config.get("LLM_MODEL")
 
         match self.prediction_api:
             case "LLM":
@@ -56,19 +55,19 @@ class PredictionApp:
                                         "Predict probability of uptrend"
                                         "(respond with a single number between 0.0 and 100.0; "
                                         "no other information!)")
-                self.lower_prob: float = float(getenv("LOWER_PROB") or 20)
-                self.upper_prob: float = float(getenv("UPPER_PROB") or 80)
+                self.lower_prob: float = float(_config.get("LOWER_PROB", 20))
+                self.upper_prob: float = float(_config.get("UPPER_PROB", 80))
                 if not 0.0 <= self.lower_prob <= self.upper_prob <= 100.0:
                     self.lower_prob = 20.0
                     self.upper_prob = 80.0
 
             case "PANDAS":
                 self.indicators: set[str] = set(json.loads(
-                    getenv("PREDICTION_INDICATORS_JSON")
+                    _config.get("PREDICTION_INDICATORS_JSON")
                 ))
-                self.price_type_column_name: str = getenv("PREDICTION_OPERATIONAL_PRICE_TYPE")
+                self.price_type_column_name: str = _config.get("PREDICTION_OPERATIONAL_PRICE_TYPE")
                 # Take an n-period lag for better signals
-                self.wait_for_n_signal_lags: int = int(getenv("PREDICTION_GLOBAL_SIGNAL_LAG"))
+                self.wait_for_n_signal_lags: int = int(_config.get("PREDICTION_GLOBAL_SIGNAL_LAG"))
                 self.df: pd.DataFrame | None = None
 
             case _:
