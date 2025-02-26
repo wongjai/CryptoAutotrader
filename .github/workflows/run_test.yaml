@@ -2,12 +2,6 @@ name: Run Unit Test via Pytest
 
 on: [ push ]
 
-env:
-  LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-  LLM_BASE_URL: ${{ env.LLM_BASE_URL }}
-  LLM_MODEL: ${{ env.LLM_MODEL }}
-  DEFAULT_PREDICTION_API: ${{ env.DEFAULT_PREDICTION_API }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
