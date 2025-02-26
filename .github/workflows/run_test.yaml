@@ -25,6 +25,6 @@ jobs:
           python -m pip install --upgrade pip && pip install -r requirements.txt
       - name: Test with pytest & Generate Coverage Report
         run: |
-          pip install pytest coverage
+          pip install coverage
           coverage run --append --source=pytest test_app_cicd.py
           coverage report -m
