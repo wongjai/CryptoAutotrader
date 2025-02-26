@@ -21,7 +21,7 @@ from ccxt.base.errors import InvalidOrder
 from ccxt import Exchange
 from dotenv import load_dotenv
 
-from config import Color
+from config import Color, TestData
 from predict import PredictionApp
 
 
@@ -406,23 +406,6 @@ if __name__ == "__main__":
                "don't run the program unless knowing EXACTLY what will happen."
     )
 
-    # TEST DATA (For LLM API. Pandas won't necessarily be so predictable)
-    # Data for uptrend
-    DEFAULT_DATA_TO_TEST_API_UP = [
-        ["2020-03-10 12:04:00", 1, 1, 1, 1, 10],
-        ["2020-03-10 12:04:01", 2, 2, 2, 2, 10],
-        ["2020-03-10 12:04:02", 3, 3, 3, 3, 10],
-        ["2020-03-10 12:04:03", 4, 4, 4, 4, 10],
-        ["2020-03-10 12:04:04", 5, 5, 5, 5, 10],
-    ]
-    # Data for downtrend
-    DEFAULT_DATA_TO_TEST_API_DOWN = [
-        ["2020-03-10 12:04:00", 10, 10, 10, 10, 10],
-        ["2020-03-10 12:04:01", 2, 2, 2, 2, 10],
-        ["2020-03-10 12:04:02", 0.3, 0.3, 0.3, 0.3, 10],
-        ["2020-03-10 12:04:03", 0.03, 0.03, 0.03, 0.03, 10],
-        ["2020-03-10 12:04:04", 0.003, 0.003, 0.003, 0.003, 10],
-    ]
     DEFAULT_MAIN_ENVIRONMENT_FILENAME = "main.env"
     DEFAULT_PREDICTION_ENVIRONMENT_FILENAME = "probability_llm.env"
     SUBPARSERS = CONSOLE_ARGUMENTS_PARSER.add_subparsers(
@@ -479,8 +462,7 @@ if __name__ == "__main__":
         case "test":
             print("[START]\tSTARTED module in `test` mode.")
             print("\t[INFO]\tUptrend recognized ?",
-                  prediction_function(DEFAULT_DATA_TO_TEST_API_UP))
+                  prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_UP))
             print("\t[INFO]\tDowntrend recognized ?",
-                  prediction_function(DEFAULT_DATA_TO_TEST_API_DOWN))
+                  prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_DOWN))
             sys.exit(print("[END] Test mode exited."))
-
