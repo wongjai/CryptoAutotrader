@@ -18,7 +18,6 @@ class TestLLM:
         Run abstract LLM prediction on test data (check if not None)
         :return:
         """
-        os.environ["DEFAULT_PREDICTION_API"] = "PROBABILITY_LLM"
         prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_with_any_llm
 
@@ -30,7 +29,6 @@ class TestLLM:
         Run LLM prediction with prob. on test data
         :return:
         """
-        os.environ["DEFAULT_PREDICTION_API"] = "PROBABILITY_LLM"
         prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_probability_with_llm
 
@@ -42,7 +40,6 @@ class TestLLM:
         Run LLM prediction with prob. on test data
         :return:
         """
-        os.environ["DEFAULT_PREDICTION_API"] = "PROBABILITY_LLM"
         prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_probability_with_llm
 
@@ -50,7 +47,6 @@ class TestLLM:
             "Incorrect prediction"
 
     def test_basic_up(self):
-        os.environ["DEFAULT_PREDICTION_API"] = "LLM"
         prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_up_or_down
 
@@ -58,7 +54,6 @@ class TestLLM:
             "Incorrect prediction"
 
     def test_basic_down(self):
-        os.environ["DEFAULT_PREDICTION_API"] = "LLM"
         prediction_app = PredictionApp()
         prediction_function = prediction_app.predict_up_or_down
 
