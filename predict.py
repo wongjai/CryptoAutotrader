@@ -156,17 +156,18 @@ class PredictionApp:
         ]
 
         anti_signals: list[pd.Series] = [
-            sdf[f"{self.price_type_column_name}_xd_{indicator}{"_delta" * self.wait_for_n_signal_lags}"].apply(bool) &
+            sdf[f"{self.price_type_column_name}_xd_{indicator}" + ("_delta" * self.wait_for_n_signal_lags)].apply(bool) &
             sdf[self.price_type_column_name].le(sdf[indicator])
-            for indicator in self.indicators]
+            for indicator in self.indicators
+        ]
 
         if self.wait_for_n_signal_lags > 1:
-            signals += [-sdf[f"{self.price_type_column_name}_xd_{indicator}{"_delta" * i}"]
-                        for i in range(1, self.wait_for_n_signal_lags)
-                        for indicator in self.indicators]
-            anti_signals += [-sdf[f"{self.price_type_column_name}_xu_{indicator}{"_delta" * i}"]
-                             for i in range(1, self.wait_for_n_signal_lags)
-                             for indicator in self.indicators]
+            signals += [-sdf[f"{self.price_type_column_name}_xd_{indicator}" + ("_delta" * i)]
+                            for i in range(1, self.wait_for_n_signal_lags)
+                            for indicator in self.indicators]
+            anti_signals += [-sdf[f"{self.price_type_column_name}_xu_{indicator}" + ("_delta" * i)]
+                            for i in range(1, self.wait_for_n_signal_lags)
+                            for indicator in self.indicators]
 
         # If multiple indicators are supplied, then use logical AND to get signals
         out["signal_buy"] = np.logical_and.reduce(signals)
