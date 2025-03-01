@@ -95,9 +95,22 @@ class App:
         self.exchange.secret = self.exchange_secret
         self.exchange.password = self.exchange_password  # it's called `passphrase` on KuCoin
 
-        # Set the symbol you want to trade on KuCoin
-        self.symbol: str = getenv("TRADING_PAIR")
-        pair_lst: list = self.symbol.split("/")
+        # Set the symbol you want to trade
+        self.symbol: str = getenv("TRADING_PAIR").strip()
+
+        # Detect format and extract base & quote assets
+        if "/" in self.symbol:
+            pair_lst: list = self.symbol.split("/")
+        else:
+            # Identify quote asset dynamically from common trading pairs
+            known_quotes = ["USDT", "BTC", "ETH", "BUSD", "USDC"]
+            for quote in known_quotes:
+                if self.symbol.endswith(quote):
+                    pair_lst = [self.symbol[:-len(quote)], quote]
+                    break
+            else:
+                raise ValueError(f"[ERROR] Invalid trading pair format: {self.symbol}")
+
         self.base_asset: str = pair_lst[0]
         self.quote_asset: str = pair_lst[1]
 
@@ -466,3 +479,4 @@ if __name__ == "__main__":
             print("\t[INFO]\tDowntrend recognized ?",
                   prediction_function(TestData.DEFAULT_DATA_TO_TEST_API_DOWN))
             sys.exit(print("[END] Test mode exited."))
+            
